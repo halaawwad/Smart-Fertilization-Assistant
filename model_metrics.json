@@ -1,0 +1,20 @@
+{
+  "split": {
+    "train": 0.7,
+    "val": 0.15,
+    "test": 0.15
+  },
+  "type_classifier": {
+    "train_accuracy": 0.9857,
+    "val_accuracy": 0.85,
+    "test_accuracy": 0.7833
+  },
+  "amount_regressor": {
+    "train_mae": 32.694327,
+    "val_mae": 52.094918,
+    "test_mae": 62.920457,
+    "train_rmse": 70.164119,
+    "val_rmse": 112.043282,
+    "test_rmse": 124.119898
+  }
+}

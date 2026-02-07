@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Smart Fertilizer AI</title>
+
+  <!-- خط عربي احترافي -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --green:#1faa59;
+      --green-dark:#148046;
+
+      /* كريمي */
+      --bg:#fbf4e9;
+      --card:rgba(251,244,233,.72);
+
+      --text:#0b1b12;
+      --muted:#4d6b5d;
+
+      --radius:26px;
+      --shadow:0 20px 50px rgba(0,0,0,.12);
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family: "Cairo", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+      background:
+        radial-gradient(800px 500px at 15% 15%, rgba(31,170,89,.10), transparent 60%),
+        radial-gradient(800px 500px at 85% 20%, rgba(20,128,70,.08), transparent 60%),
+        linear-gradient(180deg, #fff8ee 0%, var(--bg) 100%);
+      color:var(--text);
+      overflow-x:hidden;
+    }
+
+    .floating{
+      position:fixed;
+      inset:-200px;
+      background:
+        radial-gradient(18px 18px at 20% 30%, rgba(31,170,89,.20), transparent 60%),
+        radial-gradient(14px 14px at 70% 60%, rgba(31,170,89,.14), transparent 60%),
+        radial-gradient(20px 20px at 40% 80%, rgba(20,128,70,.12), transparent 60%);
+      animation: move 10s ease-in-out infinite alternate;
+      pointer-events:none;
+      z-index:0;
+    }
+
+    @keyframes move{
+      from{transform:translate(-10px,-10px)}
+      to{transform:translate(12px,12px)}
+    }
+
+    .wrapper{
+      max-width:1180px;
+      margin:auto;
+      padding:30px;
+      position:relative;
+      z-index:1;
+    }
+
+    .hero{
+      display:grid;
+      grid-template-columns: .82fr 1.18fr; /* النص أصغر، الفيديو أكبر */
+      gap:24px;
+      align-items:start;
+    }
+
+    @media(max-width:900px){
+      .hero{grid-template-columns:1fr}
+      .image-box{position:relative; top:auto}
+      .hero-video{height:60vh}
+    }
+
+    /* ✅ النص: بدون كرت/بدون اطار/بدون ظل — كأنه جزء من الخلفية */
+    .card{
+      background:transparent;     /* لا خلفية */
+      border:none;               /* لا بوردر */
+      box-shadow:none;           /* لا ظل */
+      padding:10px 6px;          /* بس مسافة بسيطة */
+      border-radius:0;           /* بدون زوايا */
+      backdrop-filter:none;
+      -webkit-backdrop-filter:none;
+    }
+
+    .badge{
+      display:inline-block;
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(31,170,89,.12);
+      color:var(--green-dark);
+      font-weight:900;
+      font-size:13px;
+      letter-spacing:.2px;
+    }
+
+    p{
+      color:var(--muted);
+      font-size:16px;
+      line-height:2.05;
+      font-weight:700;
+      margin:14px 0 0;
+    }
+
+    .actions{
+      margin-top:22px;
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    button{
+      border:none;
+      cursor:pointer;
+      padding:13px 20px;
+      border-radius:16px;
+      font-size:15px;
+      font-weight:900;
+      font-family:inherit;
+      transition: transform .08s ease, box-shadow .2s ease, background .2s ease;
+    }
+    button:active{ transform: translateY(1px); }
+
+    .primary{
+      background:linear-gradient(135deg,var(--green),var(--green-dark));
+      color:white;
+      box-shadow:0 15px 35px rgba(31,170,89,.28);
+    }
+
+    .secondary{
+      background:rgba(251,244,233,.55);
+      border:1px solid rgba(20,128,70,.22);
+      color:var(--text);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    /* ✅ صندوق الفيديو (خليه مثل ما هو لأنه عاجبك) */
+    .image-box{
+      background:rgba(251,244,233,.25);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:16px;
+
+      border:3px double rgba(20,128,70,.55);
+      position:sticky;
+      top:18px;
+      align-self:start;
+
+      box-shadow:
+        0 20px 50px rgba(0,0,0,.12),
+        0 0 0 3px rgba(255,255,255,.35) inset,
+        0 0 28px rgba(31,170,89,.18);
+    }
+
+    .hero-video{
+      width:100%;
+      height:72vh;
+      max-height:820px;
+      object-fit:cover;
+      border-radius:18px;
+      display:block;
+
+      outline:2px solid rgba(255,255,255,.55);
+      outline-offset:-10px;
+      background:transparent;
+    }
+
+    /* ❌ ما بدنا أزرار تحت الفيديو — نخفيها نهائيًا لو ظلت موجودة */
+    .video-actions{ display:none; }
+
+    /* قسم إضافي */
+    .section{
+      margin-top:26px;
+      background:var(--card);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:22px;
+      border:1px solid rgba(0,0,0,.06);
+    }
+
+    .section h2{
+      margin:0 0 10px;
+      font-size:20px;
+      font-weight:900;
+    }
+
+    .section ul{
+      margin:0;
+      padding:0 18px 0 0;
+      color:var(--muted);
+      line-height:2;
+      font-weight:700;
+    }
+
+    footer{
+      margin-top:24px;
+      text-align:center;
+      font-size:12px;
+      color:#6b8c7c;
+      font-weight:800;
+      padding-bottom:10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="floating"></div>
+
+  <div class="wrapper">
+    <div class="hero">
+
+      <!-- النص -->
+      <div class="card">
+        <span class="badge">🌱 Smart Fertilizer AI</span>
+
+        <p>
+          عزيزي المزارع،<br><br>
+          يساعدك نظام <b>Smart Fertilizer AI</b> على تحديد <b>نوع وكمية السماد المناسبة</b> لأرضك،
+          وذلك من خلال قراءة عناصر التربة الأساسية:
+          <b>N</b>، <b>P</b>، <b>K</b> و <b>pH</b>.<br><br>
+
+          يقوم النظام بتحليل البيانات وإعطائك القرار الصحيح،
+          وفي حال كانت التربة غير جاهزة للتسميد،
+          يقوم بتنبيهك فورًا وإيقاف العملية،
+          لتحافظ على أرضك وتزيد إنتاجك <b>بدون هدر</b>.
+        </p>
+
+        <!-- ✅ الأزرار هنا فقط -->
+        <div class="actions">
+          <button class="primary" onclick="location.href='/index'">ابدأ الآن</button>
+        </div>
+      </div>
+
+      <!-- الفيديو -->
+      <div class="image-box">
+        <video class="hero-video" autoplay muted loop playsinline>
+          <source src="{{ url_for('static', filename='img/view1.mp4') }}" type="video/mp4">
+          المتصفح لا يدعم تشغيل الفيديو.
+        </video>
+
+        <!-- ❌ شلنا أزرار الفيديو (ولو ضلت بالخطأ CSS بخفيها) -->
+      </div>
+
+    </div>
+
+    <div class="section">
+      <h2>كيف بشتغل النظام؟</h2>
+      <ul>
+        <li>قراءة حساسات N, P, K و pH من التربة.</li>
+        <li>تحليل البيانات وتحديد الجرعة المناسبة (g/dunum/day).</li>
+        <li>إذا pH غير مناسب → إيقاف التسميد وإظهار تنبيه.</li>
+        <li>عرض التوصية للمزارع داخل التطبيق باللغة العربية.</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>ليش مهم؟</h2>
+      <ul>
+        <li>تقليل هدر السماد.</li>
+        <li>رفع جودة المحصول.</li>
+        <li>توفير تكلفة ووقت.</li>
+        <li>قرارات دقيقة مبنية على بيانات حقيقية.</li>
+      </ul>
+    </div>
+
+    <footer>Smart Fertilizer AI</footer>
+  </div>
+</body>
+</html>

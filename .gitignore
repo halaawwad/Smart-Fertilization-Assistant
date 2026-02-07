@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual env
+.venv/
+venv/
+
+# IDE
+.idea/
+
+# Docs build
+docs/build/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Big / generated files (اختياري)
+*.mp4

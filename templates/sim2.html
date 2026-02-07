@@ -1,0 +1,945 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Smart Fertilizer System — 3D Simulation (30s)</title>
+  <style>
+    :root{
+      --bg:#0b2a17;
+      --card:rgba(255,255,255,.14);
+      --stroke:rgba(255,255,255,.22);
+      --text:#f4fff9;
+      --muted:rgba(244,255,249,.78);
+      --green:#20c36a;
+      --yellow:#ffcc66;
+      --red:#ff5c5c;
+      --shadow:0 18px 40px rgba(0,0,0,.28);
+      --radius:18px;
+    }
+    html,body{
+      height:100%;
+      margin:0;
+      background:
+        radial-gradient(1100px 700px at 30% 20%, rgba(46,240,138,.22), transparent 60%),
+        radial-gradient(900px 600px at 70% 40%, rgba(255,204,102,.16), transparent 60%),
+        var(--bg);
+      overflow:hidden;
+      font-family:system-ui,-apple-system,Segoe UI,Arial;
+    }
+    #c{position:fixed; inset:0; display:block}
+    .ui{
+      position:fixed; inset:0; pointer-events:none;
+      color:var(--text);
+      padding:18px;
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:12px;
+    }
+    .topbar{
+      display:flex; justify-content:space-between; align-items:flex-start; gap:12px;
+    }
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 12px; border-radius:999px;
+      background:rgba(32,195,106,.16);
+      border:1px solid rgba(32,195,106,.35);
+      font-weight:900; font-size:12px;
+      box-shadow: var(--shadow);
+    }
+    .card{
+      width:min(560px, 92vw);
+      background:linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,.08));
+      border:1px solid var(--stroke);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(10px);
+      overflow:hidden;
+      opacity:0;
+      transition:opacity .5s ease;
+    }
+    .card .hd{
+      padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.12);
+      font-weight:1000; letter-spacing:.2px;
+      display:flex; justify-content:space-between; align-items:center; gap:10px;
+    }
+    .badge{
+      padding:6px 10px; border-radius:999px;
+      background:rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.20);
+      font-weight:900; font-size:12px;
+    }
+    .card .bd{padding:12px 14px; display:grid; gap:10px}
+    .row{display:flex; justify-content:space-between; gap:12px; align-items:center}
+    .muted{color:var(--muted); font-weight:800; font-size:12px}
+    .val{font-weight:1000}
+    .tags{display:flex; gap:8px; flex-wrap:wrap}
+    .tag{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:7px 10px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(0,0,0,.12);
+      font-weight:950; font-size:12px;
+    }
+    .good{border-color:rgba(32,195,106,.45); background:rgba(32,195,106,.14)}
+    .warn{border-color:rgba(255,204,102,.55); background:rgba(255,204,102,.16)}
+    .bad{border-color:rgba(255,92,92,.60); background:rgba(255,92,92,.16)}
+    .ctaWrap{
+      position:fixed; right:18px; bottom:18px; display:flex; gap:10px; pointer-events:auto;
+    }
+    button{
+      border:none; cursor:pointer;
+      padding:12px 14px; border-radius:14px;
+      font-weight:1000;
+      color:#02150c;
+      background:linear-gradient(135deg, #2ef08a, #12a157);
+      box-shadow:0 18px 45px rgba(32,195,106,.25);
+    }
+    button.secondary{
+      color:var(--text);
+      background:rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.20);
+      box-shadow:0 18px 45px rgba(0,0,0,.22);
+    }
+    .subtitle{max-width:min(820px, 92vw); line-height:1.8; font-weight:800; font-size:12.5px; color:var(--muted)}
+    .bigTitle{font-size:18px; font-weight:1100}
+    .caption{
+      width:min(860px, 92vw);
+      padding:12px 14px;
+      border-radius:var(--radius);
+      background:rgba(0,0,0,.24);
+      border:1px solid rgba(255,255,255,.16);
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(8px);
+      opacity:0;
+      transition:opacity .5s ease;
+    }
+    .centerBottom{
+      position:fixed; left:50%; transform:translateX(-50%);
+      bottom:18px;
+      display:flex; justify-content:center;
+      pointer-events:none;
+    }
+  </style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div class="ui">
+  <div class="topbar">
+    <div>
+      <div class="pill">Supervised ML • pH Gate • 3D Simulation • 30s</div>
+      <div style="height:10px"></div>
+      <div class="bigTitle">نظام التسميد الذكي لمنع هدر السماد ✦</div>
+      <div class="subtitle" id="subtitle">
+        حساسات NPK + pH → متحكم ESP32 → سيرفر → قرار ذكي → تشغيل مضخة السماد مع الري (عرض 30 ثانية).
+      </div>
+    </div>
+    <div class="pill" id="timerPill">00:00</div>
+  </div>
+
+  <div class="card" id="panel">
+    <div class="hd">
+      <div id="panelTitle">Smart Fertilizer System</div>
+      <div class="badge" id="panelBadge">Sensor → AI → Pump</div>
+    </div>
+    <div class="bd" id="panelBody"></div>
+  </div>
+
+  <div class="centerBottom">
+    <div class="caption" id="caption"></div>
+  </div>
+</div>
+
+<div class="ctaWrap">
+  <button id="playBtn">▶ تشغيل العرض</button>
+  <button id="resetBtn" class="secondary">↺ إعادة</button>
+</div>
+
+<script type="module">
+  import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
+
+  // ---------- Helpers ----------
+  const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+  const lerp = (a,b,t)=>a+(b-a)*t;
+  const smoothstep = (t)=>t*t*(3-2*t);
+  const now = ()=>performance.now()/1000;
+
+  // ---------- UI ----------
+  const panel = document.getElementById('panel');
+  const panelTitle = document.getElementById('panelTitle');
+  const panelBadge = document.getElementById('panelBadge');
+  const panelBody = document.getElementById('panelBody');
+  const caption = document.getElementById('caption');
+  const timerPill = document.getElementById('timerPill');
+
+  function setPanel(show, title, badge, html){
+    panel.style.opacity = show ? 1 : 0;
+    panelTitle.textContent = title || '';
+    panelBadge.textContent = badge || '';
+    panelBody.innerHTML = html || '';
+  }
+  function setCaption(show, text){
+    caption.style.opacity = show ? 1 : 0;
+    caption.textContent = text || '';
+  }
+
+  // ---------- Scene Setup ----------
+  const canvas = document.getElementById('c');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias:true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.35;
+
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x0b2a17, 0.018);
+
+  const camera = new THREE.PerspectiveCamera(45, innerWidth/innerHeight, 0.1, 260);
+  camera.position.set(0, 18, 26);
+
+  // Lights (brighter + clearer)
+  const hemi = new THREE.HemisphereLight(0xc9ffe9, 0x123016, 0.75);
+  scene.add(hemi);
+
+  const key = new THREE.DirectionalLight(0xffffff, 1.45);
+  key.position.set(14, 24, 12);
+  key.castShadow = true;
+  key.shadow.mapSize.set(2048,2048);
+  key.shadow.camera.left = -40;
+  key.shadow.camera.right = 40;
+  key.shadow.camera.top = 40;
+  key.shadow.camera.bottom = -40;
+  scene.add(key);
+
+  const rim = new THREE.DirectionalLight(0x9be7ff, 0.35);
+  rim.position.set(-18, 12, -16);
+  scene.add(rim);
+
+  // Ground (lighter)
+  const groundGeo = new THREE.PlaneGeometry(90, 70);
+  const groundMat = new THREE.MeshStandardMaterial({ color:0x2d5a33, roughness:0.95, metalness:0.0 });
+  const ground = new THREE.Mesh(groundGeo, groundMat);
+  ground.rotation.x = -Math.PI/2;
+  ground.receiveShadow = true;
+  scene.add(ground);
+
+  // Farm plots
+  function makePlot(x, z, w, h, soilColor){
+    const g = new THREE.BoxGeometry(w, 0.42, h);
+    const m = new THREE.MeshStandardMaterial({ color:soilColor, roughness:0.98, metalness:0.0 });
+    const plot = new THREE.Mesh(g,m);
+    plot.position.set(x, 0.21, z);
+    plot.receiveShadow = true;
+    plot.castShadow = false;
+    scene.add(plot);
+
+    const border = new THREE.LineSegments(
+      new THREE.EdgesGeometry(g),
+      new THREE.LineBasicMaterial({ color:0xffffff, transparent:true, opacity:0.12 })
+    );
+    border.position.copy(plot.position);
+    scene.add(border);
+
+    return plot;
+  }
+
+  const leftPlot  = makePlot(-18, 0, 32, 42, 0x3b5a34); // cucumber
+  const rightPlot = makePlot( 18, 0, 32, 42, 0x385736); // tomato
+
+  // Drip lines
+  const dripGroup = new THREE.Group();
+  scene.add(dripGroup);
+  function addDripLines(plotX){
+    const lineMat = new THREE.MeshStandardMaterial({
+      color:0x1fe07a, roughness:0.5, metalness:0.0,
+      emissive:0x0d3a20, emissiveIntensity:0.35
+    });
+    for(let i=0;i<8;i++){
+      const g = new THREE.CylinderGeometry(0.075, 0.075, 30, 16);
+      const m = new THREE.Mesh(g, lineMat);
+      m.rotation.z = Math.PI/2;
+      m.position.set(plotX, 0.6, -14 + i*4);
+      m.castShadow = false;
+      m.receiveShadow = true;
+      dripGroup.add(m);
+    }
+  }
+  addDripLines(-18);
+  addDripLines(18);
+
+  // Plants (brighter)
+  const plants = new THREE.Group();
+  scene.add(plants);
+
+  function makeCucumberPlant(){
+    const g = new THREE.Group();
+    const stem = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.08,0.12,0.95,10),
+      new THREE.MeshStandardMaterial({ color:0x2c7a3b, roughness:0.85 })
+    );
+    stem.position.y = 0.75;
+    stem.castShadow = true;
+    g.add(stem);
+
+    const leafMat = new THREE.MeshStandardMaterial({ color:0x39e07a, roughness:0.8, metalness:0.0 });
+    for(let i=0;i<6;i++){
+      const leaf = new THREE.Mesh(new THREE.SphereGeometry(0.48, 10, 10), leafMat);
+      leaf.scale.set(1.35, 0.35, 1.15);
+      leaf.position.set((Math.random()-0.5)*0.65, 1.05 + Math.random()*0.35, (Math.random()-0.5)*0.65);
+      leaf.rotation.set(Math.random()*0.5, Math.random()*Math.PI, Math.random()*0.5);
+      leaf.castShadow = true;
+      g.add(leaf);
+    }
+    return g;
+  }
+
+  function makeTomatoPlant(){
+    const g = new THREE.Group();
+    const stem = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.07,0.12,1.85,12),
+      new THREE.MeshStandardMaterial({ color:0x2c7a3b, roughness:0.85 })
+    );
+    stem.position.y = 1.1;
+    stem.castShadow = true;
+    g.add(stem);
+
+    const stake = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.055,0.055,2.5,10),
+      new THREE.MeshStandardMaterial({ color:0x9b7a4d, roughness:0.95 })
+    );
+    stake.position.set(0.18, 1.25, 0);
+    stake.castShadow = true;
+    g.add(stake);
+
+    const leafMat = new THREE.MeshStandardMaterial({ color:0x2fd36e, roughness:0.8 });
+    for(let i=0;i<7;i++){
+      const leaf = new THREE.Mesh(new THREE.SphereGeometry(0.34, 10, 10), leafMat);
+      leaf.scale.set(1.05, 0.35, 1.15);
+      leaf.position.set((Math.random()-0.5)*0.75, 1.05 + Math.random()*1.0, (Math.random()-0.5)*0.75);
+      leaf.rotation.set(Math.random()*0.7, Math.random()*Math.PI, Math.random()*0.7);
+      leaf.castShadow = true;
+      g.add(leaf);
+    }
+
+    const fruitMat = new THREE.MeshStandardMaterial({
+      color:0xff2f2f, roughness:0.6, metalness:0.0,
+      emissive:0x2a0000, emissiveIntensity:0.28
+    });
+    for(let i=0;i<4;i++){
+      const t = new THREE.Mesh(new THREE.SphereGeometry(0.17, 16, 16), fruitMat);
+      t.position.set((Math.random()-0.5)*0.65, 1.15 + Math.random()*0.65, (Math.random()-0.5)*0.65);
+      t.castShadow = true;
+      g.add(t);
+    }
+    return g;
+  }
+
+  function scatterPlants(plotX, plantFactory){
+    for(let r=0;r<5;r++){
+      for(let c=0;c<4;c++){
+        const p = plantFactory();
+        p.position.set(plotX + (c-1.5)*6 + (Math.random()-0.5)*1.2, 0.0, (r-2)*7 + (Math.random()-0.5)*1.5);
+        p.rotation.y = Math.random()*Math.PI*2;
+        plants.add(p);
+      }
+    }
+  }
+  scatterPlants(-18, makeCucumberPlant);
+  scatterPlants( 18, makeTomatoPlant);
+
+  // Control box (solar-powered)
+  const controlGroup = new THREE.Group();
+  scene.add(controlGroup);
+
+  const box = new THREE.Mesh(
+    new THREE.BoxGeometry(3.4, 2.35, 2.35),
+    new THREE.MeshStandardMaterial({ color:0x214038, roughness:0.65, metalness:0.18 })
+  );
+  box.position.set(0, 1.35, 0);
+  box.castShadow = true;
+  box.receiveShadow = true;
+  controlGroup.add(box);
+
+  const solar = new THREE.Mesh(
+    new THREE.BoxGeometry(3.6, 0.16, 2.55),
+    new THREE.MeshStandardMaterial({
+      color:0x0c2a44, roughness:0.35, metalness:0.65,
+      emissive:0x06203a, emissiveIntensity:0.22
+    })
+  );
+  solar.position.set(0, 2.72, 0);
+  solar.rotation.x = -0.25;
+  solar.castShadow = true;
+  controlGroup.add(solar);
+
+  // ESP32 board glow
+  const esp = new THREE.Mesh(
+    new THREE.PlaneGeometry(1.7, 0.95),
+    new THREE.MeshStandardMaterial({ color:0x0f3d2a, emissive:0x18ff9a, emissiveIntensity:0.0, roughness:0.8 })
+  );
+  esp.position.set(0, 1.35, 1.18);
+  controlGroup.add(esp);
+
+  const led = new THREE.Mesh(
+    new THREE.SphereGeometry(0.085, 16, 16),
+    new THREE.MeshStandardMaterial({ color:0x18ff9a, emissive:0x18ff9a, emissiveIntensity:0.25 })
+  );
+  led.position.set(0.72, 1.18, 1.19);
+  controlGroup.add(led);
+
+  // Fertilizer tank + pump
+  const pumpGroup = new THREE.Group();
+  scene.add(pumpGroup);
+  pumpGroup.position.set(6.8, 0.0, -16);
+
+  const tank = new THREE.Mesh(
+    new THREE.CylinderGeometry(1.25, 1.25, 2.8, 24),
+    new THREE.MeshStandardMaterial({ color:0x3a3a3a, roughness:0.7, metalness:0.2 })
+  );
+  tank.position.set(0, 1.4, 0);
+  tank.castShadow = true;
+  pumpGroup.add(tank);
+
+  const tankCap = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.95, 0.95, 0.17, 18),
+    new THREE.MeshStandardMaterial({ color:0x2a2a2a, roughness:0.8 })
+  );
+  tankCap.position.set(0, 2.9, 0);
+  pumpGroup.add(tankCap);
+
+  const pump = new THREE.Mesh(
+    new THREE.BoxGeometry(1.05, 0.75, 0.85),
+    new THREE.MeshStandardMaterial({ color:0x1c5a3b, roughness:0.55, metalness:0.2, emissive:0x000000, emissiveIntensity:0.0 })
+  );
+  pump.position.set(2.05, 0.65, 0);
+  pump.castShadow = true;
+  pumpGroup.add(pump);
+
+  // Transparent pipe
+  const pipeCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(2.05, 0.85, 0.0),
+    new THREE.Vector3(2.9, 1.1, -4.0),
+    new THREE.Vector3(1.2, 1.0, -9.0),
+    new THREE.Vector3(-2.1, 0.8, -12.2),
+    new THREE.Vector3(-4.7, 0.78, -14.8),
+    new THREE.Vector3(-6.2, 0.78, -16.0),
+  ]);
+  const pipeGeo = new THREE.TubeGeometry(pipeCurve, 140, 0.11, 12, false);
+  const pipeMat = new THREE.MeshPhysicalMaterial({
+    color:0xb7fff0, roughness:0.12, metalness:0.0,
+    transmission:0.88, thickness:0.22, transparent:true, opacity:0.38
+  });
+  const pipe = new THREE.Mesh(pipeGeo, pipeMat);
+  pipe.receiveShadow = true;
+  pumpGroup.add(pipe);
+
+  // Fertilizer flow drop
+  const drop = new THREE.Mesh(
+    new THREE.SphereGeometry(0.15, 20, 20),
+    new THREE.MeshStandardMaterial({ color:0x3cff9a, emissive:0x1aff88, emissiveIntensity:0.75, roughness:0.35 })
+  );
+  drop.visible = false;
+  scene.add(drop);
+
+  // ---------- Label sprite helper ----------
+  function makeLabelSprite(text, bg = "rgba(255,255,255,0.92)", fg="#0b2a17"){
+    const cnv = document.createElement("canvas");
+    cnv.width = 256; cnv.height = 128;
+    const ctx = cnv.getContext("2d");
+
+    const x=16,y=16,w=224,h=96,r=26;
+    ctx.fillStyle = bg;
+    ctx.strokeStyle = "rgba(0,0,0,0.16)";
+    ctx.lineWidth = 8;
+
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = fg;
+    ctx.font = "900 64px system-ui";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(text, 128, 64);
+
+    const tex = new THREE.CanvasTexture(cnv);
+    tex.needsUpdate = true;
+
+    const mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
+    const spr = new THREE.Sprite(mat);
+    spr.scale.set(2.8, 1.4, 1);
+    return spr;
+  }
+
+  // Sensors (big + labels)
+  const sensorGroup = new THREE.Group();
+  scene.add(sensorGroup);
+
+  function makeSensor(color){
+    const g = new THREE.Group();
+
+    const body = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.28, 0.28, 1.35, 22),
+      new THREE.MeshStandardMaterial({
+        color, roughness:0.55, metalness:0.25,
+        emissive:color, emissiveIntensity:0.08
+      })
+    );
+    body.castShadow = true;
+    g.add(body);
+
+    const cap = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.36, 0.36, 0.18, 22),
+      new THREE.MeshStandardMaterial({ color:0xf2fff7, roughness:0.6, metalness:0.05 })
+    );
+    cap.position.y = 0.75;
+    cap.castShadow = true;
+    g.add(cap);
+
+    const base = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.42, 0.42, 0.10, 22),
+      new THREE.MeshStandardMaterial({ color:0x183526, roughness:0.9 })
+    );
+    base.position.y = -0.72;
+    g.add(base);
+
+    return g;
+  }
+
+  const sN  = makeSensor(0x2ef08a); sN.position.set(-20, 0.8, -2);
+  const sP  = makeSensor(0x6fb6ff); sP.position.set(-16, 0.8,  6);
+  const sK  = makeSensor(0xffcc66); sK.position.set(-15, 0.8, -10);
+  const sPH = makeSensor(0xff5c5c); sPH.position.set(-21, 0.8, 12);
+
+  sensorGroup.add(sN,sP,sK,sPH);
+
+  const lN  = makeLabelSprite("N");
+  const lP  = makeLabelSprite("P");
+  const lK  = makeLabelSprite("K");
+  const lpH = makeLabelSprite("pH");
+
+  lN.position.set(0, 1.35, 0);  sN.add(lN);
+  lP.position.set(0, 1.35, 0);  sP.add(lP);
+  lK.position.set(0, 1.35, 0);  sK.add(lK);
+  lpH.position.set(0, 1.35, 0); sPH.add(lpH);
+
+  // Pulses around sensors (stage 2)
+  function pulseRing(){
+    const ring = new THREE.Mesh(
+      new THREE.RingGeometry(0.55, 0.78, 48),
+      new THREE.MeshBasicMaterial({ color:0x2ef08a, transparent:true, opacity:0.0 })
+    );
+    ring.rotation.x = -Math.PI/2;
+    ring.visible = false;
+    scene.add(ring);
+    return ring;
+  }
+  const rings = [pulseRing(), pulseRing(), pulseRing(), pulseRing()];
+
+  // Packets from sensors to control box (stage 4)
+  function makePacket(){
+    const m = new THREE.Mesh(
+      new THREE.SphereGeometry(0.14, 16, 16),
+      new THREE.MeshStandardMaterial({
+        color:0x2ef08a, emissive:0x2ef08a, emissiveIntensity:0.9,
+        roughness:0.25
+      })
+    );
+    m.visible = false;
+    scene.add(m);
+    return m;
+  }
+  const packets = [makePacket(), makePacket(), makePacket(), makePacket()];
+
+  // Cloud server icon (stage 5)
+  const cloud = new THREE.Group();
+  scene.add(cloud);
+  cloud.visible = false;
+
+  const cloudMat = new THREE.MeshStandardMaterial({ color:0xffffff, roughness:0.45, metalness:0.0, transparent:true, opacity:0.88 });
+  function puff(x,y,z,r){
+    const m = new THREE.Mesh(new THREE.SphereGeometry(r, 22, 22), cloudMat);
+    m.position.set(x,y,z);
+    cloud.add(m);
+  }
+  puff(-1.0, 0.0, 0.0, 1.2);
+  puff( 0.0, 0.4, 0.0, 1.45);
+  puff( 1.2, 0.1, 0.0, 1.1);
+  puff( 0.2,-0.3, 0.0, 1.0);
+  cloud.position.set(0, 11, -18);
+
+  // Wi-Fi waves (stage 4 & 5)
+  const waveGroup = new THREE.Group();
+  scene.add(waveGroup);
+  waveGroup.visible = false;
+
+  function makeWave(r){
+    const geo = new THREE.RingGeometry(r-0.035, r+0.035, 64, 1, 0, Math.PI);
+    const mat = new THREE.MeshBasicMaterial({ color:0x2ef08a, transparent:true, opacity:0.0, side:THREE.DoubleSide });
+    const w = new THREE.Mesh(geo, mat);
+    w.rotation.set(Math.PI/2, 0, Math.PI/2);
+    w.position.set(0, 3.15, 0);
+    return w;
+  }
+  const waves = [makeWave(0.9), makeWave(1.35), makeWave(1.8)];
+  waves.forEach(w=>waveGroup.add(w));
+
+  // Beam from control box to cloud (stage 5)
+  const beam = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.06, 0.18, 18, 18, 1, true),
+    new THREE.MeshBasicMaterial({ color:0x6fffe0, transparent:true, opacity:0.0, side:THREE.DoubleSide })
+  );
+  beam.visible = false;
+  scene.add(beam);
+
+  // Camera target
+  const camTarget = new THREE.Vector3(0,0,0);
+
+  // ---------- Timeline (30 seconds) ----------
+  const DURATION = 30;
+  let playing = false;
+  let t0 = 0;
+
+  const state = {
+    N:187, P:300, K:120, pH:6.1,
+    crop:"cucumber", soil:"sandy",
+    fertType:"NPK", dailyDose:270, scheduleDays:2,
+    pHok:true,
+    pumpOn:false,
+  };
+
+  function formatTime(s){
+    const mm = String(Math.floor(s/60)).padStart(2,'0');
+    const ss = String(Math.floor(s%60)).padStart(2,'0');
+    return `${mm}:${ss}`;
+  }
+
+  // Stages inside 30s
+  const ST = {
+    s1:0,   // 0-3 intro
+    s2:3,   // 3-7 read sensors
+    s3:7,   // 7-10 esp32 packet
+    s4:10,  // 10-13 send to box / wifi
+    s5:13,  // 13-20 server pipeline + gate
+    s6:20,  // 20-24 app decision
+    s7:24,  // 24-27 actuation
+    s8:27   // 27-30 outcome
+  };
+
+  function stageName(t){
+    if(t < ST.s2) return 1;
+    if(t < ST.s3) return 2;
+    if(t < ST.s4) return 3;
+    if(t < ST.s5) return 4;
+    if(t < ST.s6) return 5;
+    if(t < ST.s7) return 6;
+    if(t < ST.s8) return 7;
+    return 8;
+  }
+
+  function updateUIForStage(t){
+    const st = stageName(t);
+
+    setCaption(false, '');
+    setPanel(false, '', '', '');
+
+    if(st === 1){
+      setCaption(true, "الهدر في التسميد مشكلة تؤثر على التربة والإنتاج الزراعي.");
+      setPanel(true, "Smart Fertilizer System", "Sensor → AI → Pump", `
+        <div class="row"><div class="muted">المشهد</div><div class="val">مزرعة (خيار + بندورة)</div></div>
+        <div class="row"><div class="muted">نظام الري</div><div class="val">تنقيط</div></div>
+        <div class="row"><div class="muted">المتحكم</div><div class="val">ESP32 + طاقة شمسية</div></div>
+      `);
+    }
+
+    if(st === 2){
+      setCaption(true, "نقرأ حالة التربة: N, P, K و pH (حساسات واضحة).");
+      setPanel(true, "Sensor Readings", "NPK + pH", `
+        <div class="tags">
+          <span class="tag warn">N: ${state.N}</span>
+          <span class="tag warn">P: ${state.P}</span>
+          <span class="tag warn">K: ${state.K}</span>
+          <span class="tag good">pH: ${state.pH.toFixed(1)}</span>
+        </div>
+        <div class="row"><div class="muted">حالة pH</div><div class="val">${state.pHok ? "Optimal" : "Out of range"}</div></div>
+      `);
+    }
+
+    if(st === 3){
+      setCaption(true, "المتحكم ESP32 يجمع القراءات ويجهزها للإرسال.");
+      setPanel(true, "Inside Control Box", "ESP32 → Data Packet", `
+        <div class="row"><div class="muted">Sampling</div><div class="val">كل 10 دقائق (مثال)</div></div>
+        <div class="row"><div class="muted">Payload</div><div class="val">{N:${state.N}, P:${state.P}, K:${state.K}, pH:${state.pH.toFixed(1)}}</div></div>
+      `);
+    }
+
+    if(st === 4){
+      setCaption(true, "يتم إرسال القيم: من الحساسات → صندوق التحكم → Wi-Fi.");
+      setPanel(true, "Transmission", "Sensors → Box → Wi-Fi", `
+        <div class="row"><div class="muted">طريقة الاتصال</div><div class="val">Wi-Fi</div></div>
+        <div class="row"><div class="muted">الحالة</div><div class="val">Sending…</div></div>
+      `);
+    }
+
+    if(st === 5){
+      setCaption(true, "على السيرفر: تحقق من القيم + بوابة pH لإيقاف التسميد عند الخطر + نموذج قرار.");
+      const phTag = state.pHok ? `<span class="tag good">pH Gate: Pass</span>` : `<span class="tag bad">pH Gate: Stop</span>`;
+      setPanel(true, "Server Pipeline", "Validation → pH Gate → AI", `
+        <div class="tags">
+          <span class="tag">Input Validation</span>
+          ${phTag}
+          <span class="tag">Deficit Calc</span>
+          <span class="tag">AI Decision</span>
+        </div>
+        ${state.pHok ? "" : `<div class="tag bad" style="width:fit-content;margin-top:10px">Stop Fertilization</div>`}
+      `);
+    }
+
+    if(st === 6){
+      setCaption(true, "الذكاء الاصطناعي يحدد نوع السماد والكمية والجدول المناسب.");
+      setPanel(true, "App Dashboard", "Smart Fertilization Decision", `
+        <div class="row"><div class="muted">المحصول</div><div class="val">${state.crop === "cucumber" ? "خيار" : "بندورة"}</div></div>
+        <div class="row"><div class="muted">نوع التربة</div><div class="val">${state.soil === "sandy" ? "رملية" : "طينية"}</div></div>
+        <div class="tags">
+          <span class="tag">Fertilizer: <b>${state.fertType}</b></span>
+          <span class="tag good">Daily: <b>${state.dailyDose} g</b></span>
+          <span class="tag warn">Schedule: كل <b>${state.scheduleDays}</b> يوم</span>
+        </div>
+      `);
+    }
+
+    if(st === 7){
+      setCaption(true, "تنفيذ القرار تلقائيًا: Relay → Pump → ضخ السماد مع الري.");
+      setPanel(true, "Actuation", "Command → Relay → Pump", `
+        <div class="tags">
+          <span class="tag">Command Sent</span>
+          <span class="tag ${state.pumpOn ? "good" : "warn"}">Relay: ${state.pumpOn ? "ON" : "OFF"}</span>
+          <span class="tag ${state.pumpOn ? "good" : "warn"}">Pump: ${state.pumpOn ? "RUNNING" : "IDLE"}</span>
+        </div>
+      `);
+    }
+
+    if(st === 8){
+      setCaption(true, "النتيجة: تقليل الهدر ورفع كفاءة التسميد.");
+      setPanel(true, "Outcome", "Right fertilizer • Right dose • Right time", `
+        <div class="tags">
+          <span class="tag good">Right fertilizer</span>
+          <span class="tag good">Right dose</span>
+          <span class="tag good">Right time</span>
+        </div>
+        <div class="row"><div class="muted">النتيجة</div><div class="val">تقليل الهدر + تحسين الامتصاص</div></div>
+      `);
+    }
+  }
+
+  // ---------- Camera choreography ----------
+  function camMoveTo(pos, lookAt, alpha){
+    camera.position.lerp(pos, alpha);
+    camTarget.lerp(lookAt, alpha);
+    camera.lookAt(camTarget);
+  }
+
+  function getStageCamera(t){
+    const st = stageName(t);
+
+    if(st === 1){
+      return { pos:new THREE.Vector3(0, 26, 34), look:new THREE.Vector3(0, 0.6, 0) };
+    }
+    if(st === 2){
+      // close to sensors on cucumber plot
+      return { pos:new THREE.Vector3(-22, 7.4, 10.5), look:new THREE.Vector3(-18.5, 1.2, 2.0) };
+    }
+    if(st === 3){
+      return { pos:new THREE.Vector3(0.5, 2.9, 5.6), look:new THREE.Vector3(0, 1.5, 0.6) };
+    }
+    if(st === 4){
+      return { pos:new THREE.Vector3(-7, 9.2, 12), look:new THREE.Vector3(-6, 2.2, 2) };
+    }
+    if(st === 5){
+      return { pos:new THREE.Vector3(0, 12.2, -6.5), look:new THREE.Vector3(0, 11, -18) };
+    }
+    if(st === 6){
+      return { pos:new THREE.Vector3(0, 10.5, 18.5), look:new THREE.Vector3(0, 2.4, 0) };
+    }
+    if(st === 7){
+      return { pos:new THREE.Vector3(11.2, 5.3, -10.3), look:new THREE.Vector3(6.8, 1.1, -16) };
+    }
+    return { pos:new THREE.Vector3(-10.5, 4.8, -18.8), look:new THREE.Vector3(-14, 1.0, -18) };
+  }
+
+  // ---------- Logical scenario ----------
+  function applyScenario(){
+    state.crop = "cucumber";
+    state.soil = "sandy";
+    state.N = 187;
+    state.P = 300;
+    state.K = 120;
+    state.pH = 6.1;
+
+    state.pHok = (state.pH >= 5.5 && state.pH <= 7.5);
+
+    state.fertType = "NPK";
+    state.dailyDose = 270;
+    state.scheduleDays = (state.soil === "sandy") ? 2 : 3;
+  }
+  applyScenario();
+
+  // ---------- Visual events ----------
+  function updateEvents(t){
+    const st = stageName(t);
+
+    // ESP32 blink during stage 3 and 4
+    const blink = (st === 3 || st === 4) ? (Math.sin(t*12)*0.5+0.5) : 0;
+    led.material.emissiveIntensity = lerp(0.18, 1.1, blink);
+    esp.material.emissiveIntensity = (st === 3) ? 0.42 : 0.0;
+
+    // Sensor pulses stage 2
+    const showPulses = st === 2;
+    const pts = [sN.position, sP.position, sK.position, sPH.position];
+    for(let i=0;i<rings.length;i++){
+      const r = rings[i];
+      r.visible = showPulses;
+      if(showPulses){
+        const phase = (t*1.5 + i*0.6) % 1;
+        const a = smoothstep(phase);
+        const wpos = sensorGroup.localToWorld(pts[i].clone());
+        r.position.set(wpos.x, 0.62, wpos.z);
+        const sc = lerp(0.7, 2.4, phase);
+        r.scale.set(sc, sc, sc);
+        r.material.opacity = lerp(0.38, 0.0, a);
+      }
+    }
+
+    // Packets from sensors to control box stage 4
+    const sending = (st === 4);
+    const sensorPos = [sN.position, sP.position, sK.position, sPH.position];
+
+    packets.forEach((pk, i)=>{
+      pk.visible = sending;
+      if(!sending) return;
+
+      const localT = ((t - ST.s4) * 0.95 + i * 0.18) % 1;
+      const a = smoothstep(localT);
+
+      const from = sensorGroup.localToWorld(sensorPos[i].clone());
+      const to   = controlGroup.localToWorld(new THREE.Vector3(0, 1.4, 0.9));
+
+      const mid = from.clone().lerp(to, 0.5);
+      mid.y += 2.4;
+
+      const p1 = from.clone().lerp(mid, a);
+      const p2 = mid.clone().lerp(to, a);
+      const p  = p1.clone().lerp(p2, a);
+
+      pk.position.copy(p);
+    });
+
+    // Wi-Fi waves stage 4 and 5
+    waveGroup.visible = (st === 4 || st === 5);
+    if(st === 4 || st === 5){
+      const base = (t*1.25) % 1;
+      waves.forEach((w, i)=>{
+        const phase = (base + i*0.22) % 1;
+        const a = smoothstep(phase);
+        w.scale.setScalar(lerp(0.65, 2.55, phase));
+        w.material.opacity = lerp(0.46, 0.0, a);
+      });
+      waveGroup.position.copy(controlGroup.position);
+    }
+
+    // Cloud stage 5 with gentle float
+    cloud.visible = st === 5;
+    if(st === 5){
+      cloud.position.y = 11 + Math.sin(t*1.5)*0.25;
+    }
+
+    // Beam from box to cloud (stage 5)
+    beam.visible = st === 5;
+    if(st === 5){
+      const from = controlGroup.localToWorld(new THREE.Vector3(0, 3.2, 0));
+      const to = cloud.position.clone();
+
+      const dir = to.clone().sub(from);
+      const len = dir.length();
+      const mid = from.clone().add(dir.multiplyScalar(0.5));
+
+      beam.position.copy(mid);
+      beam.scale.set(1, len/18, 1);
+
+      // orient cylinder along direction
+      const up = new THREE.Vector3(0,1,0);
+      const q = new THREE.Quaternion().setFromUnitVectors(up, to.clone().sub(from).normalize());
+      beam.quaternion.copy(q);
+
+      beam.material.opacity = 0.18 + Math.sin(t*6)*0.04;
+    } else {
+      beam.material.opacity = 0.0;
+    }
+
+    // Pump stage 7 (only if pH ok)
+    state.pumpOn = (st === 7) && state.pHok;
+    pump.material.emissiveIntensity = state.pumpOn ? 0.45 : 0.0;
+    pump.material.emissive = new THREE.Color(state.pumpOn ? 0x18ff9a : 0x000000);
+
+    // Fertilizer drop along pipe when pump on
+    drop.visible = state.pumpOn;
+    if(state.pumpOn){
+      const u = ((t - ST.s7) * 0.6) % 1;
+      const p = pipeCurve.getPointAt(u);
+      drop.position.copy(p);
+    }
+  }
+
+  // ---------- Render loop ----------
+  function updateAt(t){
+    timerPill.textContent = formatTime(t);
+    updateUIForStage(t);
+
+    const c = getStageCamera(t);
+    const alpha = 0.055; // smoother + faster lock
+    const drift = new THREE.Vector3(Math.sin(t*0.35)*0.18, Math.sin(t*0.22)*0.10, Math.cos(t*0.28)*0.18);
+    camMoveTo(c.pos.clone().add(drift), c.look, alpha);
+
+    updateEvents(t);
+  }
+
+  document.getElementById('playBtn').addEventListener('click', ()=>{
+    playing = true;
+    t0 = now();
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', ()=>{
+    playing = false;
+    updateAt(0);
+  });
+
+  function animate(){
+    requestAnimationFrame(animate);
+
+    const t = playing ? clamp(now() - t0, 0, DURATION) : 0;
+    if(playing && t >= DURATION) playing = false;
+
+    updateAt(t);
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  addEventListener('resize', ()=>{
+    renderer.setSize(innerWidth, innerHeight);
+    camera.aspect = innerWidth/innerHeight;
+    camera.updateProjectionMatrix();
+  });
+
+  updateAt(0);
+</script>
+</body>
+</html>
