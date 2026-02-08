@@ -105,7 +105,7 @@ def predict_fertilizer(
         proba = _clf.predict_proba(X_type)[0]
         confidence = float(proba.max()) * 100.0
 
-    # Predict amount if regressor exists
+
     amount = 0.0
     if _reg is not None:
         X_amount = pd.DataFrame([{

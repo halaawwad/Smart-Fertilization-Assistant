@@ -6,70 +6,59 @@
   <title>Smart Fertilizer AI</title>
 
   <style>
-    /* =========================
-       THEME TOKENS (Slide-like)
-       ========================= */
     :root{
-      --bg: #F6F0E6;            /* warm cream */
+      --bg:#F6F0E6;
       --bg2:#F2E9DC;
-      --paper:#FBF6ED;          /* card surface */
+      --paper:#FBF6ED;
       --paper2:#F7F0E4;
 
-      --text:#2F241C;           /* dark brown */
-      --muted:#6C5B4B;          /* muted brown */
+      --text:#2F241C;
+      --muted:#6C5B4B;
       --muted2:#8A7662;
 
-      --green:#1F7A4A;          /* agricultural green */
+      --green:#1F7A4A;
       --green2:#16603A;
 
-      --gold:#D7B24C;           /* highlight / accent */
-      --stroke: rgba(47,36,28,.12);
+      --gold:#D7B24C;
+      --stroke:RGBA(47,36,28,.12);
 
-      --radius-xl: 26px;
-      --radius-lg: 22px;
-      --radius-md: 16px;
+      --radius-xl:26px;
+      --radius-lg:22px;
+      --radius-md:16px;
 
-      --shadow-1: 0 18px 44px rgba(47,36,28,.14);
-      --shadow-2: 0 10px 24px rgba(47,36,28,.12);
-      --ring: 0 0 0 4px rgba(31,122,74,.12);
+      --shadow-1:0 18px 44px RGBA(47,36,28,.14);
+      --shadow-2:0 10px 24px RGBA(47,36,28,.12);
+      --ring:0 0 0 4px RGBA(31,122,74,.12);
     }
 
     *{box-sizing:border-box}
 
     body{
       margin:0;
-      font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+      font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
       color:var(--text);
       padding:24px;
       overflow-x:hidden;
-
-      /* Background closer to your slides:
-         - warm gradient
-         - subtle grain
-         - dusty corners
-         - soil at bottom
-      */
       background:
-        radial-gradient(900px 580px at 12% 10%, rgba(31,122,74,.14), transparent 60%),
-        radial-gradient(900px 580px at 88% 14%, rgba(215,178,76,.10), transparent 62%),
-        radial-gradient(840px 540px at 50% 92%, rgba(47,36,28,.08), transparent 62%),
+        radial-gradient(900px 580px at 12% 10%, RGBA(31,122,74,.14), transparent 60%),
+        radial-gradient(900px 580px at 88% 14%, RGBA(215,178,76,.10), transparent 62%),
+        radial-gradient(840px 540px at 50% 92%, RGBA(47,36,28,.08), transparent 62%),
         linear-gradient(180deg, #FFFFFF 0%, var(--bg) 100%);
       position:relative;
     }
 
-    /* soft paper grain overlay (no image) */
     body::before{
       content:"";
       position:fixed;
       inset:0;
       pointer-events:none;
       background:
-        radial-gradient(1px 1px at 10% 20%, rgba(47,36,28,.08), transparent 60%),
-        radial-gradient(1px 1px at 30% 70%, rgba(47,36,28,.06), transparent 60%),
-        radial-gradient(1px 1px at 75% 35%, rgba(47,36,28,.07), transparent 60%),
-        radial-gradient(1px 1px at 90% 80%, rgba(47,36,28,.05), transparent 60%);
+        radial-gradient(1px 1px at 10% 20%, RGBA(47,36,28,.08), transparent 60%),
+        radial-gradient(1px 1px at 30% 70%, RGBA(47,36,28,.06), transparent 60%),
+        radial-gradient(1px 1px at 75% 35%, RGBA(47,36,28,.07), transparent 60%),
+        radial-gradient(1px 1px at 90% 80%, RGBA(47,36,28,.05), transparent 60%);
       opacity:.45;
-      filter: blur(.2px);
+      filter:blur(.2px);
       mix-blend-mode:multiply;
     }
 
@@ -79,19 +68,17 @@
       position:relative;
     }
 
-    /* top-right subtle branch (SVG inline) */
     .branch{
       position:absolute;
       top:-10px;
       left:0;
-      width: 260px;
+      width:260px;
       height:auto;
       opacity:.9;
       pointer-events:none;
-      filter: drop-shadow(0 12px 18px rgba(47,36,28,.10));
+      filter:drop-shadow(0 12px 18px RGBA(47,36,28,.10));
     }
 
-    /* Soil base at bottom like slides */
     .soil{
       position:absolute;
       left:0; right:0;
@@ -99,49 +86,46 @@
       height:160px;
       pointer-events:none;
       background:
-        radial-gradient(140px 70px at 10% 55%, rgba(47,36,28,.18), transparent 60%),
-        radial-gradient(160px 80px at 28% 70%, rgba(47,36,28,.16), transparent 62%),
-        radial-gradient(180px 90px at 55% 66%, rgba(47,36,28,.14), transparent 62%),
-        radial-gradient(220px 110px at 85% 78%, rgba(47,36,28,.16), transparent 62%),
-        linear-gradient(180deg, rgba(246,240,230,0) 0%, rgba(47,36,28,.16) 45%, rgba(47,36,28,.22) 100%);
-      border-radius: 0 0 30px 30px;
-      filter: blur(.2px);
+        radial-gradient(140px 70px at 10% 55%, RGBA(47,36,28,.18), transparent 60%),
+        radial-gradient(160px 80px at 28% 70%, RGBA(47,36,28,.16), transparent 62%),
+        radial-gradient(180px 90px at 55% 66%, RGBA(47,36,28,.14), transparent 62%),
+        radial-gradient(220px 110px at 85% 78%, RGBA(47,36,28,.16), transparent 62%),
+        linear-gradient(180deg, RGBA(246,240,230,0) 0%, RGBA(47,36,28,.16) 45%, RGBA(47,36,28,.22) 100%);
+      border-radius:0 0 30px 30px;
+      filter:blur(.2px);
       opacity:.95;
     }
 
-    /* main card container */
     .card{
       position:relative;
-      border-radius: var(--radius-xl);
+      border-radius:var(--radius-xl);
       overflow:hidden;
       border:1px solid var(--stroke);
-      box-shadow: var(--shadow-1);
+      box-shadow:var(--shadow-1);
       background:
-        radial-gradient(1100px 260px at 50% 0%, rgba(31,122,74,.10), transparent 60%),
+        radial-gradient(1100px 260px at 50% 0%, RGBA(31,122,74,.10), transparent 60%),
         linear-gradient(180deg, var(--paper) 0%, var(--paper2) 100%);
     }
 
-    /* top ribbon line like your slides accent */
     .ribbon{
       height:6px;
-      background: linear-gradient(90deg, rgba(31,122,74,.95), rgba(215,178,76,.75), rgba(31,122,74,.70));
+      background:linear-gradient(90deg, RGBA(31,122,74,.95), RGBA(215,178,76,.75), RGBA(31,122,74,.70));
       opacity:.9;
     }
 
     header{
       padding:22px 22px 16px;
-      border-bottom:1px solid rgba(47,36,28,.10);
+      border-bottom:1px solid RGBA(47,36,28,.10);
       display:flex;
       justify-content:space-between;
       align-items:flex-start;
       gap:14px;
     }
 
-    /* Title style (heavier, slide vibe) */
     h1{
       margin:0;
       font-size:24px;
-      font-weight:1000;
+      font-weight:900;
       letter-spacing:.2px;
       line-height:1.45;
       color:var(--text);
@@ -153,21 +137,20 @@
       font-size:13px;
       line-height:2;
       max-width:860px;
-      font-weight:750;
+      font-weight:700;
     }
 
-    /* pill badge */
     .badge{
       padding:10px 14px;
       border-radius:999px;
-      background: rgba(31,122,74,.10);
-      border:1px solid rgba(31,122,74,.24);
-      color: var(--green2);
+      background:RGBA(31,122,74,.10);
+      border:1px solid RGBA(31,122,74,.24);
+      color:var(--green2);
       font-size:12px;
-      font-weight:1000;
+      font-weight:900;
       white-space:nowrap;
       height:fit-content;
-      box-shadow: 0 12px 22px rgba(31,122,74,.12);
+      box-shadow:0 12px 22px RGBA(31,122,74,.12);
     }
 
     .spark{
@@ -175,19 +158,17 @@
       margin-inline-start:8px;
       font-size:14px;
       opacity:.95;
-      filter: drop-shadow(0 0 12px rgba(215,178,76,.25));
-      animation: tw 1.8s ease-in-out infinite;
+      filter:drop-shadow(0 0 12px RGBA(215,178,76,.25));
+      animation:tw 1.8s ease-in-out infinite;
     }
+
     @keyframes tw{
-      0%,100%{ transform: translateY(0); opacity:.85; }
-      50%{ transform: translateY(-2px); opacity:1; }
+      0%,100%{transform:translateY(0); opacity:.85;}
+      50%{transform:translateY(-2px); opacity:1;}
     }
 
-    .body{
-      padding:18px 22px 22px;
-    }
+    .body{padding:18px 22px 22px}
 
-    /* Form grid (same but nicer spacing) */
     .grid{
       display:grid;
       grid-template-columns:1fr 1fr;
@@ -203,56 +184,55 @@
     label{
       display:block;
       margin:0 0 7px;
-      color: rgba(108,91,75,.98);
+      color:RGBA(108,91,75,.98);
       font-size:12px;
-      font-weight:950;
+      font-weight:800;
     }
 
-    .field{ position:relative; }
+    .field{position:relative}
 
     input,select{
       width:100%;
       padding:13px 12px;
       border-radius:18px;
-      border:1px solid rgba(47,36,28,.14);
-      background: rgba(255,255,255,.88);
+      border:1px solid RGBA(47,36,28,.14);
+      background:RGBA(255,255,255,.88);
       color:var(--text);
       outline:none;
       font-size:14px;
-      font-weight:850;
-      box-shadow: 0 10px 22px rgba(47,36,28,.08);
-      transition: border-color .15s ease, box-shadow .15s ease, transform .08s ease, background .15s ease;
-      backdrop-filter: blur(2px);
+      font-weight:700;
+      box-shadow:0 10px 22px RGBA(47,36,28,.08);
+      transition:border-color .15s ease, box-shadow .15s ease, transform .08s ease, background .15s ease;
+      backdrop-filter:blur(2px);
     }
 
-    input::placeholder{color:rgba(108,91,75,.55); font-weight:750;}
+    input::placeholder{color:RGBA(108,91,75,.55); font-weight:600}
 
     input:focus,select:focus{
-      border-color: rgba(31,122,74,.45);
-      box-shadow: var(--ring), 0 14px 26px rgba(47,36,28,.10);
-      transform: translateY(-1px);
-      background: rgba(255,255,255,.95);
+      border-color:RGBA(31,122,74,.45);
+      box-shadow:var(--ring), 0 14px 26px RGBA(47,36,28,.10);
+      transform:translateY(-1px);
+      background:RGBA(255,255,255,.95);
     }
 
-    /* soft glow behind focused field */
     .field:focus-within::after{
       content:"";
       position:absolute;
       inset:-4px;
       border-radius:20px;
-      background: radial-gradient(220px 70px at 50% 0%, rgba(31,122,74,.16), transparent 62%);
+      background:radial-gradient(220px 70px at 50% 0%, RGBA(31,122,74,.16), transparent 62%);
       pointer-events:none;
       z-index:-1;
-      filter: blur(10px);
+      filter:blur(10px);
       opacity:.95;
     }
 
     .note{
       margin-top:6px;
-      color: rgba(108,91,75,.78);
+      color:RGBA(108,91,75,.78);
       font-size:12px;
       line-height:1.8;
-      font-weight:700;
+      font-weight:600;
     }
 
     .actions{
@@ -269,12 +249,12 @@
       cursor:pointer;
       border-radius:999px;
       padding:12px 16px;
-      font-weight:1000;
-      background: linear-gradient(135deg, var(--green), var(--green2));
-      color:#fff;
-      box-shadow: 0 16px 34px rgba(31,122,74,.22);
+      font-weight:900;
+      background:linear-gradient(135deg, var(--green), var(--green2));
+      color:#FFF;
+      box-shadow:0 16px 34px RGBA(31,122,74,.22);
       min-width:220px;
-      transition: transform .08s ease, filter .15s ease, box-shadow .15s ease;
+      transition:transform .08s ease, filter .15s ease, box-shadow .15s ease;
       position:relative;
       overflow:hidden;
     }
@@ -283,62 +263,68 @@
       content:"";
       position:absolute;
       inset:-70%;
-      background: radial-gradient(260px 140px at 20% 20%, rgba(255,255,255,.34), transparent 62%);
-      transform: rotate(10deg);
+      background:radial-gradient(260px 140px at 20% 20%, RGBA(255,255,255,.34), transparent 62%);
+      transform:rotate(10deg);
       opacity:.55;
     }
 
-    button:hover{ filter: brightness(1.02); box-shadow: 0 18px 40px rgba(31,122,74,.25); }
-    button:active{ transform: scale(.99); }
+    button:hover{filter:brightness(1.02); box-shadow:0 18px 40px RGBA(31,122,74,.25)}
+    button:active{transform:scale(.99)}
 
     .btn-secondary{
-      background: rgba(255,255,255,.92);
-      border:1px solid rgba(47,36,28,.14);
-      color: var(--text);
-      box-shadow: 0 12px 22px rgba(47,36,28,.08);
+      background:RGBA(255,255,255,.92);
+      border:1px solid RGBA(47,36,28,.14);
+      color:var(--text);
+      box-shadow:0 12px 22px RGBA(47,36,28,.08);
       min-width:180px;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:12px 16px;
+      border-radius:999px;
+      font-weight:800;
     }
 
     .hint{
-      color: rgba(108,91,75,.90);
+      color:RGBA(108,91,75,.90);
       font-size:12px;
       line-height:1.8;
       flex:1;
       min-width:260px;
-      font-weight:760;
+      font-weight:700;
     }
 
-    /* Alerts - warmer / earthy */
     .alert{
       margin-top:14px;
       border-radius:18px;
       padding:12px 12px;
-      border:1px solid rgba(215,178,76,.55);
-      background: rgba(215,178,76,.18);
-      color: rgba(90,55,0,.95);
-      font-weight:950;
+      border:1px solid RGBA(215,178,76,.55);
+      background:RGBA(215,178,76,.18);
+      color:RGBA(90,55,0,.95);
+      font-weight:800;
       line-height:1.9;
-      box-shadow: 0 12px 22px rgba(47,36,28,.08);
+      box-shadow:0 12px 22px RGBA(47,36,28,.08);
     }
     .alert-good{
-      border-color: rgba(31,122,74,.35);
-      background: rgba(31,122,74,.10);
-      color: rgba(22,96,58,.98);
+      border-color:RGBA(31,122,74,.35);
+      background:RGBA(31,122,74,.10);
+      color:RGBA(22,96,58,.98);
     }
     .alert-warn{
-      border-color: rgba(215,178,76,.60);
-      background: rgba(215,178,76,.20);
-      color: rgba(90,55,0,.95);
+      border-color:RGBA(215,178,76,.60);
+      background:RGBA(215,178,76,.20);
+      color:RGBA(90,55,0,.95);
     }
     .alert-bad{
-      border-color: rgba(200,40,40,.34);
-      background: rgba(255,92,92,.14);
-      color: rgba(160,30,30,.98);
+      border-color:RGBA(200,40,40,.34);
+      background:RGBA(255,92,92,.14);
+      color:RGBA(160,30,30,.98);
     }
 
     .result{
       margin-top:18px;
-      border-top:1px solid rgba(47,36,28,.10);
+      border-top:1px solid RGBA(47,36,28,.10);
       padding-top:14px;
       display:grid;
       gap:12px;
@@ -356,16 +342,15 @@
       .btn-secondary{min-width:100%}
     }
 
-    /* KPI cards more slide-like */
     .kpi{
-      border:1px solid rgba(47,36,28,.12);
-      background: rgba(255,255,255,.86);
-      border-radius: 20px;
+      border:1px solid RGBA(47,36,28,.12);
+      background:RGBA(255,255,255,.86);
+      border-radius:20px;
       padding:12px;
-      box-shadow: var(--shadow-2);
+      box-shadow:var(--shadow-2);
       position:relative;
       overflow:hidden;
-      backdrop-filter: blur(2px);
+      backdrop-filter:blur(2px);
     }
 
     .kpi-glow::after{
@@ -373,87 +358,73 @@
       position:absolute;
       inset:-60%;
       background:
-        radial-gradient(420px 180px at 20% 25%, rgba(31,122,74,.12), transparent 62%),
-        radial-gradient(420px 180px at 80% 35%, rgba(215,178,76,.10), transparent 62%),
-        radial-gradient(420px 180px at 50% 85%, rgba(47,36,28,.08), transparent 62%);
-      filter: blur(12px);
+        radial-gradient(420px 180px at 20% 25%, RGBA(31,122,74,.12), transparent 62%),
+        radial-gradient(420px 180px at 80% 35%, RGBA(215,178,76,.10), transparent 62%),
+        radial-gradient(420px 180px at 50% 85%, RGBA(47,36,28,.08), transparent 62%);
+      filter:blur(12px);
       opacity:.95;
       pointer-events:none;
     }
 
-    .k{color:rgba(108,91,75,.95); font-size:12px; font-weight:1000; margin-bottom:8px}
-    .v{font-size:15px; font-weight:1000; line-height:1.8; position:relative; z-index:1;}
+    .k{color:RGBA(108,91,75,.95); font-size:12px; font-weight:900; margin-bottom:8px}
+    .v{font-size:15px; font-weight:900; line-height:1.8; position:relative; z-index:1}
 
-    .tags{display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; position:relative; z-index:1;}
+    .tags{display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; position:relative; z-index:1}
     .tag{
       display:inline-block;
       padding:7px 10px;
       border-radius:999px;
-      border:1px solid rgba(47,36,28,.14);
-      background: rgba(255,255,255,.92);
+      border:1px solid RGBA(47,36,28,.14);
+      background:RGBA(255,255,255,.92);
       font-size:12px;
-      font-weight:950;
-      box-shadow: 0 10px 18px rgba(47,36,28,.07);
+      font-weight:800;
+      box-shadow:0 10px 18px RGBA(47,36,28,.07);
     }
 
-    .good{border-color:rgba(31,122,74,.35); color:rgba(22,96,58,.98); background:rgba(31,122,74,.08)}
-    .bad{border-color:rgba(200,40,40,.28); color:rgba(160,30,30,.98); background:rgba(255,92,92,.12)}
-    .neutral{border-color:rgba(47,36,28,.16); color:rgba(47,36,28,.82); background:rgba(47,36,28,.05)}
+    .good{border-color:RGBA(31,122,74,.35); color:RGBA(22,96,58,.98); background:RGBA(31,122,74,.08)}
+    .bad{border-color:RGBA(200,40,40,.28); color:RGBA(160,30,30,.98); background:RGBA(255,92,92,.12)}
+    .neutral{border-color:RGBA(47,36,28,.16); color:RGBA(47,36,28,.82); background:RGBA(47,36,28,.05)}
     .muted{color:var(--muted)}
 
-    .def-zero{
-      border-color:rgba(31,122,74,.45);
-      background:rgba(31,122,74,.12);
-      color:rgba(22,96,58,.98);
-    }
-    .def-small{
-      border-color:rgba(215,178,76,.65);
-      background:rgba(215,178,76,.20);
-      color:rgba(120,80,0,.95);
-    }
-    .def-large{
-      border-color:rgba(200,40,40,.45);
-      background:rgba(255,92,92,.18);
-      color:rgba(160,30,30,.98);
-    }
+    .def-zero{border-color:RGBA(31,122,74,.45); background:RGBA(31,122,74,.12); color:RGBA(22,96,58,.98)}
+    .def-small{border-color:RGBA(215,178,76,.65); background:RGBA(215,178,76,.20); color:RGBA(120,80,0,.95)}
+    .def-large{border-color:RGBA(200,40,40,.45); background:RGBA(255,92,92,.18); color:RGBA(160,30,30,.98)}
 
     footer{
       padding:14px 18px 16px;
-      border-top:1px solid rgba(47,36,28,.10);
-      color: rgba(108,91,75,.86);
+      border-top:1px solid RGBA(47,36,28,.10);
+      color:RGBA(108,91,75,.86);
       font-size:12px;
       text-align:center;
-      background: rgba(31,122,74,.05);
+      background:RGBA(31,122,74,.05);
       font-weight:900;
     }
 
-    /* Small highlight helper (gold) - useful if you want inline highlights */
-    .hl{
-      background: rgba(215,178,76,.26);
-      border: 1px solid rgba(215,178,76,.60);
-      padding: 0.1rem 0.45rem;
-      border-radius: 12px;
-      font-weight: 950;
+    .metrics-actions{
+      margin-top:14px;
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .metrics-box{
+      display:none;
+      margin-top:12px;
     }
   </style>
 </head>
 
 <body>
   <div class="wrap">
-
-    <!-- Decorative branch (top-left because RTL feels nicer here) -->
     <svg class="branch" viewBox="0 0 420 220" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M20 180 C110 120, 190 120, 280 90 C330 72, 360 52, 405 30"
-            fill="none" stroke="rgba(47,36,28,.35)" stroke-width="8" stroke-linecap="round"/>
-      <path d="M290 92 C305 86, 320 82, 338 76"
-            fill="none" stroke="rgba(47,36,28,.25)" stroke-width="5" stroke-linecap="round"/>
-      <!-- Leaves -->
-      <g fill="rgba(31,122,74,.85)">
+      <path d="M20 180 C110 120, 190 120, 280 90 C330 72, 360 52, 405 30" fill="none" stroke="RGBA(47,36,28,.35)" stroke-width="8" stroke-linecap="round"/>
+      <path d="M290 92 C305 86, 320 82, 338 76" fill="none" stroke="RGBA(47,36,28,.25)" stroke-width="5" stroke-linecap="round"/>
+      <g fill="RGBA(31,122,74,.85)">
         <path d="M300 78 C320 60, 345 63, 352 86 C330 95, 312 92, 300 78Z"/>
         <path d="M270 92 C290 74, 315 78, 322 100 C300 108, 282 106, 270 92Z"/>
         <path d="M340 60 C360 44, 386 48, 392 72 C370 82, 350 78, 340 60Z"/>
       </g>
-      <g fill="rgba(31,122,74,.70)">
+      <g fill="RGBA(31,122,74,.70)">
         <path d="M250 106 C268 90, 292 94, 298 114 C278 122, 262 120, 250 106Z"/>
       </g>
     </svg>
@@ -464,10 +435,7 @@
       <header>
         <div>
           <h1>نظام التسميد الذكي لمنع هدر السماد<span class="spark">✦</span></h1>
-          <div class="sub">
-            أدخلي قراءات <b>N,P,K</b> و<b>pH</b>.
-
-          </div>
+          <div class="sub">أدخلي قراءات <b>N,P,K</b> و<b>pH</b>.</div>
         </div>
         <div class="badge">Supervised ML • pH Gate</div>
       </header>
@@ -478,35 +446,33 @@
         {% set chosen_soil = request.form.get('soil_type','') %}
 
         <form method="POST">
+          <button id="cropAutoSubmit" type="submit" name="action" value="select_crop" formnovalidate style="display:none;"></button>
+
           <div class="grid">
             <div class="field">
-              <label>المحصول</label>
-              <select name="crop" required onchange="this.form.submit()">
+              <label for="crop">المحصول</label>
+              <select id="crop" name="crop" required>
                 {% for c in crops %}
-                  <option value="{{ c }}" {% if chosen_crop == c %}selected{% endif %}>
-                    {{ crop_labels.get(c, c) }}
-                  </option>
+                  <option value="{{ c }}" {% if chosen_crop == c %}selected{% endif %}>{{ crop_labels.get(c, c) }}</option>
                 {% endfor %}
               </select>
               <div class="note">اختاري المحصول ثم المرحلة لأن احتياجات NPK تختلف.</div>
             </div>
 
             <div class="field">
-              <label>مرحلة النمو</label>
+              <label for="stage">مرحلة النمو</label>
               {% set stage_list = stages_by_crop[chosen_crop] if stages_by_crop is defined and chosen_crop in stages_by_crop else stages %}
-              <select name="stage" required>
+              <select id="stage" name="stage" required>
                 {% for s in stage_list %}
-                  <option value="{{ s }}" {% if chosen_stage == s %}selected{% endif %}>
-                    {{ stage_labels[chosen_crop].get(s, s) if stage_labels is defined and chosen_crop in stage_labels else s }}
-                  </option>
+                  <option value="{{ s }}" {% if chosen_stage == s %}selected{% endif %}>{{ stage_labels[chosen_crop].get(s, s) if stage_labels is defined and chosen_crop in stage_labels else s }}</option>
                 {% endfor %}
               </select>
               <div class="note">المرحلة تحدد الاحتياج المثالي للعناصر.</div>
             </div>
 
             <div class="field">
-              <label>نوع التربة</label>
-              <select name="soil_type" required>
+              <label for="soil_type">نوع التربة</label>
+              <select id="soil_type" name="soil_type" required>
                 <option value="">اختاري نوع التربة</option>
                 <option value="sandy">رملية</option>
                 <option value="clay">طينية</option>
@@ -515,56 +481,52 @@
             </div>
 
             <div class="field">
-              <label>pH التربة (من الحساس)</label>
-              <input type="number" step="0.1" min="0" max="14" name="ph" placeholder="مثال: 6.4"
-                     required value="{{ request.form.get('ph','') }}">
+              <label for="ph">pH التربة (من الحساس)</label>
+              <input id="ph" type="number" step="0.1" min="0" max="14" name="ph" placeholder="مثال: 6.4" required value="{{ request.form.get('ph','') }}">
             </div>
 
             <div class="field">
-              <label>الوحدة</label>
-              <input value="g/dunum/day" readonly>
+              <label for="unit_display">الوحدة</label>
+              <input id="unit_display" value="g/dunum/day" readonly aria-readonly="true">
               <input type="hidden" name="unit" value="g/dunum/day">
             </div>
 
             <div class="field">
-              <label>نيتروجين التربة (N)</label>
-              <input type="number" step="any" min="0" name="soilN" placeholder="مثال: 80" required
-                     value="{{ request.form.get('soilN','') }}">
+              <label for="soilN">نيتروجين التربة (N)</label>
+              <input id="soilN" type="number" step="any" min="0" name="soilN" placeholder="مثال: 80" required value="{{ request.form.get('soilN','') }}">
             </div>
 
             <div class="field">
-              <label>فوسفور التربة (P)</label>
-              <input type="number" step="any" min="0" name="soilP" placeholder="مثال: 60" required
-                     value="{{ request.form.get('soilP','') }}">
+              <label for="soilP">فوسفور التربة (P)</label>
+              <input id="soilP" type="number" step="any" min="0" name="soilP" placeholder="مثال: 60" required value="{{ request.form.get('soilP','') }}">
             </div>
 
             <div class="field">
-              <label>بوتاسيوم التربة (K)</label>
-              <input type="number" step="any" min="0" name="soilK" placeholder="مثال: 120" required
-                     value="{{ request.form.get('soilK','') }}">
+              <label for="soilK">بوتاسيوم التربة (K)</label>
+              <input id="soilK" type="number" step="any" min="0" name="soilK" placeholder="مثال: 120" required value="{{ request.form.get('soilK','') }}">
             </div>
 
             <div class="field">
-              <label>ملاحظة</label>
-              <input value="يمكن ربط حساسات لاحقًا" readonly>
+              <label for="note_display">ملاحظة</label>
+              <input id="note_display" value="يمكن ربط حساسات لاحقًا" readonly aria-readonly="true">
               <div class="note">الواجهة حالياً إدخال يدوي — لاحقاً ربط ESP32/Arduino.</div>
             </div>
           </div>
 
+          <input type="hidden" id="chosen_soil" value="{{ chosen_soil }}">
+
           <div class="actions">
             <button type="submit" name="action" value="recommend">احسبي التوصية</button>
-            <button class="btn-secondary" type="button" onclick="window.location='/'">ابدأ من جديد</button>
-            <div class="hint">
-              التوصية = نقص العناصر (Rule-based) + (ML يقرر السماد والكمية).
-            </div>
+            <a class="btn-secondary" href="/" role="button">ابدأ من جديد</a>
+            <div class="hint">التوصية = نقص العناصر (Rule-based) + (ML يقرر السماد والكمية).</div>
           </div>
 
           {% if metrics %}
-            <div style="margin-top:14px; display:flex; gap:12px; flex-wrap:wrap;">
-              <button type="button" class="btn-secondary" onclick="toggleMetrics()">ثقة المودل (Train/Val/Test)</button>
+            <div class="metrics-actions">
+              <button type="button" class="btn-secondary" id="toggleMetricsBtn">ثقة المودل (Train/Val/Test)</button>
             </div>
 
-            <div id="metricsBox" class="kpi" style="display:none; margin-top:12px;">
+            <div id="metricsBox" class="kpi metrics-box">
               <div class="k">أداء المودل (Train / Validation / Test)</div>
 
               <div class="tags">
@@ -599,13 +561,6 @@
 
               <div class="note" style="margin-top:10px;"></div>
             </div>
-
-            <script>
-              function toggleMetrics(){
-                const box = document.getElementById("metricsBox");
-                box.style.display = (box.style.display === "none") ? "block" : "none";
-              }
-            </script>
           {% endif %}
 
           {% if warning %}
@@ -714,7 +669,6 @@
               </div>
             </div>
             {% endif %}
-
           </div>
           {% endif %}
         </form>
@@ -724,9 +678,34 @@
         Smart Fertilizer AI — Cucumber & Tomato — Supervised ML (Type + Amount) + pH Gate
       </footer>
 
-      <!-- Decorative soil base -->
       <div class="soil"></div>
     </div>
   </div>
+
+  <script>
+    (function(){
+      const crop = document.getElementById("crop");
+      const autoBtn = document.getElementById("cropAutoSubmit");
+      if (crop && autoBtn){
+        crop.addEventListener("change", function(){
+          autoBtn.click();
+        });
+      }
+
+      const soilSelect = document.getElementById("soil_type");
+      const chosenSoil = document.getElementById("chosen_soil");
+      if (soilSelect && chosenSoil && chosenSoil.value){
+        soilSelect.value = chosenSoil.value;
+      }
+
+      const toggleBtn = document.getElementById("toggleMetricsBtn");
+      const box = document.getElementById("metricsBox");
+      if (toggleBtn && box){
+        toggleBtn.addEventListener("click", function(){
+          box.style.display = (box.style.display === "none" || box.style.display === "") ? "block" : "none";
+        });
+      }
+    })();
+  </script>
 </body>
 </html>

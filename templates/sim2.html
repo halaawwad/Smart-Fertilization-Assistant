@@ -159,13 +159,11 @@
 <script type="module">
   import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
 
-  // ---------- Helpers ----------
   const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
   const lerp = (a,b,t)=>a+(b-a)*t;
   const smoothstep = (t)=>t*t*(3-2*t);
   const now = ()=>performance.now()/1000;
 
-  // ---------- UI ----------
   const panel = document.getElementById('panel');
   const panelTitle = document.getElementById('panelTitle');
   const panelBadge = document.getElementById('panelBadge');
@@ -184,7 +182,6 @@
     caption.textContent = text || '';
   }
 
-  // ---------- Scene Setup ----------
   const canvas = document.getElementById('c');
   const renderer = new THREE.WebGLRenderer({ canvas, antialias:true });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
@@ -200,7 +197,6 @@
   const camera = new THREE.PerspectiveCamera(45, innerWidth/innerHeight, 0.1, 260);
   camera.position.set(0, 18, 26);
 
-  // Lights (brighter + clearer)
   const hemi = new THREE.HemisphereLight(0xc9ffe9, 0x123016, 0.75);
   scene.add(hemi);
 
@@ -218,7 +214,6 @@
   rim.position.set(-18, 12, -16);
   scene.add(rim);
 
-  // Ground (lighter)
   const groundGeo = new THREE.PlaneGeometry(90, 70);
   const groundMat = new THREE.MeshStandardMaterial({ color:0x2d5a33, roughness:0.95, metalness:0.0 });
   const ground = new THREE.Mesh(groundGeo, groundMat);
@@ -226,7 +221,6 @@
   ground.receiveShadow = true;
   scene.add(ground);
 
-  // Farm plots
   function makePlot(x, z, w, h, soilColor){
     const g = new THREE.BoxGeometry(w, 0.42, h);
     const m = new THREE.MeshStandardMaterial({ color:soilColor, roughness:0.98, metalness:0.0 });
@@ -246,10 +240,9 @@
     return plot;
   }
 
-  const leftPlot  = makePlot(-18, 0, 32, 42, 0x3b5a34); // cucumber
-  const rightPlot = makePlot( 18, 0, 32, 42, 0x385736); // tomato
+  makePlot(-18, 0, 32, 42, 0x3b5a34);
+  makePlot( 18, 0, 32, 42, 0x385736);
 
-  // Drip lines
   const dripGroup = new THREE.Group();
   scene.add(dripGroup);
   function addDripLines(plotX){
@@ -270,7 +263,6 @@
   addDripLines(-18);
   addDripLines(18);
 
-  // Plants (brighter)
   const plants = new THREE.Group();
   scene.add(plants);
 
@@ -350,7 +342,6 @@
   scatterPlants(-18, makeCucumberPlant);
   scatterPlants( 18, makeTomatoPlant);
 
-  // Control box (solar-powered)
   const controlGroup = new THREE.Group();
   scene.add(controlGroup);
 
@@ -375,7 +366,6 @@
   solar.castShadow = true;
   controlGroup.add(solar);
 
-  // ESP32 board glow
   const esp = new THREE.Mesh(
     new THREE.PlaneGeometry(1.7, 0.95),
     new THREE.MeshStandardMaterial({ color:0x0f3d2a, emissive:0x18ff9a, emissiveIntensity:0.0, roughness:0.8 })
@@ -390,7 +380,6 @@
   led.position.set(0.72, 1.18, 1.19);
   controlGroup.add(led);
 
-  // Fertilizer tank + pump
   const pumpGroup = new THREE.Group();
   scene.add(pumpGroup);
   pumpGroup.position.set(6.8, 0.0, -16);
@@ -418,7 +407,6 @@
   pump.castShadow = true;
   pumpGroup.add(pump);
 
-  // Transparent pipe
   const pipeCurve = new THREE.CatmullRomCurve3([
     new THREE.Vector3(2.05, 0.85, 0.0),
     new THREE.Vector3(2.9, 1.1, -4.0),
@@ -436,7 +424,6 @@
   pipe.receiveShadow = true;
   pumpGroup.add(pipe);
 
-  // Fertilizer flow drop
   const drop = new THREE.Mesh(
     new THREE.SphereGeometry(0.15, 20, 20),
     new THREE.MeshStandardMaterial({ color:0x3cff9a, emissive:0x1aff88, emissiveIntensity:0.75, roughness:0.35 })
@@ -444,7 +431,6 @@
   drop.visible = false;
   scene.add(drop);
 
-  // ---------- Label sprite helper ----------
   function makeLabelSprite(text, bg = "rgba(255,255,255,0.92)", fg="#0b2a17"){
     const cnv = document.createElement("canvas");
     cnv.width = 256; cnv.height = 128;
@@ -480,7 +466,6 @@
     return spr;
   }
 
-  // Sensors (big + labels)
   const sensorGroup = new THREE.Group();
   scene.add(sensorGroup);
 
@@ -532,7 +517,6 @@
   lK.position.set(0, 1.35, 0);  sK.add(lK);
   lpH.position.set(0, 1.35, 0); sPH.add(lpH);
 
-  // Pulses around sensors (stage 2)
   function pulseRing(){
     const ring = new THREE.Mesh(
       new THREE.RingGeometry(0.55, 0.78, 48),
@@ -545,7 +529,6 @@
   }
   const rings = [pulseRing(), pulseRing(), pulseRing(), pulseRing()];
 
-  // Packets from sensors to control box (stage 4)
   function makePacket(){
     const m = new THREE.Mesh(
       new THREE.SphereGeometry(0.14, 16, 16),
@@ -560,7 +543,6 @@
   }
   const packets = [makePacket(), makePacket(), makePacket(), makePacket()];
 
-  // Cloud server icon (stage 5)
   const cloud = new THREE.Group();
   scene.add(cloud);
   cloud.visible = false;
@@ -577,7 +559,6 @@
   puff( 0.2,-0.3, 0.0, 1.0);
   cloud.position.set(0, 11, -18);
 
-  // Wi-Fi waves (stage 4 & 5)
   const waveGroup = new THREE.Group();
   scene.add(waveGroup);
   waveGroup.visible = false;
@@ -593,7 +574,6 @@
   const waves = [makeWave(0.9), makeWave(1.35), makeWave(1.8)];
   waves.forEach(w=>waveGroup.add(w));
 
-  // Beam from control box to cloud (stage 5)
   const beam = new THREE.Mesh(
     new THREE.CylinderGeometry(0.06, 0.18, 18, 18, 1, true),
     new THREE.MeshBasicMaterial({ color:0x6fffe0, transparent:true, opacity:0.0, side:THREE.DoubleSide })
@@ -601,10 +581,8 @@
   beam.visible = false;
   scene.add(beam);
 
-  // Camera target
   const camTarget = new THREE.Vector3(0,0,0);
 
-  // ---------- Timeline (30 seconds) ----------
   const DURATION = 30;
   let playing = false;
   let t0 = 0;
@@ -623,16 +601,15 @@
     return `${mm}:${ss}`;
   }
 
-  // Stages inside 30s
   const ST = {
-    s1:0,   // 0-3 intro
-    s2:3,   // 3-7 read sensors
-    s3:7,   // 7-10 esp32 packet
-    s4:10,  // 10-13 send to box / wifi
-    s5:13,  // 13-20 server pipeline + gate
-    s6:20,  // 20-24 app decision
-    s7:24,  // 24-27 actuation
-    s8:27   // 27-30 outcome
+    s1:0,
+    s2:3,
+    s3:7,
+    s4:10,
+    s5:13,
+    s6:20,
+    s7:24,
+    s8:27
   };
 
   function stageName(t){
@@ -741,7 +718,6 @@
     }
   }
 
-  // ---------- Camera choreography ----------
   function camMoveTo(pos, lookAt, alpha){
     camera.position.lerp(pos, alpha);
     camTarget.lerp(lookAt, alpha);
@@ -755,7 +731,6 @@
       return { pos:new THREE.Vector3(0, 26, 34), look:new THREE.Vector3(0, 0.6, 0) };
     }
     if(st === 2){
-      // close to sensors on cucumber plot
       return { pos:new THREE.Vector3(-22, 7.4, 10.5), look:new THREE.Vector3(-18.5, 1.2, 2.0) };
     }
     if(st === 3){
@@ -776,7 +751,6 @@
     return { pos:new THREE.Vector3(-10.5, 4.8, -18.8), look:new THREE.Vector3(-14, 1.0, -18) };
   }
 
-  // ---------- Logical scenario ----------
   function applyScenario(){
     state.crop = "cucumber";
     state.soil = "sandy";
@@ -793,16 +767,13 @@
   }
   applyScenario();
 
-  // ---------- Visual events ----------
   function updateEvents(t){
     const st = stageName(t);
 
-    // ESP32 blink during stage 3 and 4
     const blink = (st === 3 || st === 4) ? (Math.sin(t*12)*0.5+0.5) : 0;
     led.material.emissiveIntensity = lerp(0.18, 1.1, blink);
     esp.material.emissiveIntensity = (st === 3) ? 0.42 : 0.0;
 
-    // Sensor pulses stage 2
     const showPulses = st === 2;
     const pts = [sN.position, sP.position, sK.position, sPH.position];
     for(let i=0;i<rings.length;i++){
@@ -819,7 +790,6 @@
       }
     }
 
-    // Packets from sensors to control box stage 4
     const sending = (st === 4);
     const sensorPos = [sN.position, sP.position, sK.position, sPH.position];
 
@@ -843,7 +813,6 @@
       pk.position.copy(p);
     });
 
-    // Wi-Fi waves stage 4 and 5
     waveGroup.visible = (st === 4 || st === 5);
     if(st === 4 || st === 5){
       const base = (t*1.25) % 1;
@@ -856,13 +825,11 @@
       waveGroup.position.copy(controlGroup.position);
     }
 
-    // Cloud stage 5 with gentle float
     cloud.visible = st === 5;
     if(st === 5){
       cloud.position.y = 11 + Math.sin(t*1.5)*0.25;
     }
 
-    // Beam from box to cloud (stage 5)
     beam.visible = st === 5;
     if(st === 5){
       const from = controlGroup.localToWorld(new THREE.Vector3(0, 3.2, 0));
@@ -875,7 +842,6 @@
       beam.position.copy(mid);
       beam.scale.set(1, len/18, 1);
 
-      // orient cylinder along direction
       const up = new THREE.Vector3(0,1,0);
       const q = new THREE.Quaternion().setFromUnitVectors(up, to.clone().sub(from).normalize());
       beam.quaternion.copy(q);
@@ -885,12 +851,10 @@
       beam.material.opacity = 0.0;
     }
 
-    // Pump stage 7 (only if pH ok)
     state.pumpOn = (st === 7) && state.pHok;
     pump.material.emissiveIntensity = state.pumpOn ? 0.45 : 0.0;
     pump.material.emissive = new THREE.Color(state.pumpOn ? 0x18ff9a : 0x000000);
 
-    // Fertilizer drop along pipe when pump on
     drop.visible = state.pumpOn;
     if(state.pumpOn){
       const u = ((t - ST.s7) * 0.6) % 1;
@@ -899,13 +863,12 @@
     }
   }
 
-  // ---------- Render loop ----------
   function updateAt(t){
     timerPill.textContent = formatTime(t);
     updateUIForStage(t);
 
     const c = getStageCamera(t);
-    const alpha = 0.055; // smoother + faster lock
+    const alpha = 0.055;
     const drift = new THREE.Vector3(Math.sin(t*0.35)*0.18, Math.sin(t*0.22)*0.10, Math.cos(t*0.28)*0.18);
     camMoveTo(c.pos.clone().add(drift), c.look, alpha);
 

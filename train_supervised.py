@@ -50,11 +50,11 @@ def train_models(data_path: str | Path = DATA_PATH) -> dict:
     if missing:
         raise ValueError(f"Missing columns: {missing}")
 
-    # Clean types (safe)
+
     df["fertilizer_type"] = df["fertilizer_type"].astype(str)
     df["fertilizer_amount_g"] = pd.to_numeric(df["fertilizer_amount_g"], errors="coerce")
 
-    # Drop rows with missing target amount (if any)
+
     df = df.dropna(subset=["fertilizer_amount_g"]).copy()
 
     X_type = df[["crop", "stage", "soilN", "soilP", "soilK", "ph"]]
